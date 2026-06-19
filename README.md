@@ -78,6 +78,161 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
+## Использование эндпоинтов
+
+Базовый URL при локальном запуске:
+
+```text
+http://127.0.0.1:8000
+```
+
+### Healthcheck
+
+Проверка, что API запущен:
+
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Ответ:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+### Создать уведомление
+
+```http
+POST /notifications
+```
+
+Пример:
+
+```bash
+curl -X POST http://127.0.0.1:8000/notifications \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "student@example.com",
+    "message": "Your assignment deadline is tomorrow at 18:00.",
+    "send_at": "2030-06-19T12:00:00Z",
+    "priority": "high",
+  }'
+```
+
+Обязательные поля:
+
+- `email`;
+- `message`;
+- `send_at`;
+- `priority`.
+
+Опциональное поле:
+
+- `max_attempts`.
+
+Успешный ответ: `201 Created`.
+
+Пример ответа:
+
+```json
+{
+  "id": 1,
+  "email": "student@example.com",
+  "message": "Your assignment deadline is tomorrow at 18:00.",
+  "send_at": "2030-06-19T12:00:00Z",
+  "priority": "high",
+  "status": "scheduled",
+  "attempt_count": 0,
+  "max_attempts": 3,
+  "last_attempt_at": null,
+  "sent_at": null,
+  "last_error": null,
+  "created_at": "2030-06-18T09:30:00Z",
+  "updated_at": "2030-06-18T09:30:00Z"
+}
+```
+
+Возможные ошибки:
+
+- `422` - ошибка валидации;
+- `429` - превышен rate limit.
+
+### Получить список уведомлений
+
+```http
+GET /notifications
+```
+
+Пример:
+
+```bash
+curl "http://127.0.0.1:8000/notifications?limit=20&offset=0&priority=high"
+```
+
+Query-параметры:
+
+- `limit` - сколько записей вернуть, от 1 до 100;
+- `offset` - сколько записей пропустить;
+- `priority` - фильтр по приоритету: `low`, `medium`, `high`.
+
+Все параметры необязательные.
+
+Успешный ответ: `200 OK`.
+
+Пример ответа:
+
+```json
+[
+  {
+    "id": 1,
+    "email": "student@example.com",
+    "message": "Your assignment deadline is tomorrow at 18:00.",
+    "send_at": "2030-06-19T12:00:00Z",
+    "priority": "high",
+    "status": "scheduled",
+    "attempt_count": 0,
+    "max_attempts": 3,
+    "last_attempt_at": null,
+    "sent_at": null,
+    "last_error": null,
+    "created_at": "2030-06-18T09:30:00Z",
+    "updated_at": "2030-06-18T09:30:00Z"
+  }
+]
+```
+
+Возможная ошибка:
+
+- `422` - неверные query-параметры.
+
+### Удалить уведомление
+
+```http
+DELETE /notifications/{id}
+```
+
+Пример:
+
+```bash
+curl -X DELETE http://127.0.0.1:8000/notifications/1
+```
+
+Удалять можно только уведомления со статусом `scheduled`.
+
+Успешный ответ:
+
+```text
+204 No Content
+```
+
+Возможные ошибки:
+
+- `404` - уведомление не найдено;
+- `409` - уведомление уже не в статусе `scheduled`;
+- `422` - некорректный `id`.
+
 API:
 
 ```text
