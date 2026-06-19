@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Select, select
+from sqlalchemy import Select, case, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.notification import (
@@ -64,12 +64,18 @@ class NotificationRepository:
         now: datetime,
         limit: int,
     ) -> list[Notification]:
+        priority_order = case(
+            (Notification.priority == NotificationPriority.HIGH, 1),
+            (Notification.priority == NotificationPriority.MEDIUM, 2),
+            (Notification.priority == NotificationPriority.LOW, 3),
+            else_=4,
+        )
         query = (
             select(Notification)
             .where(Notification.status == NotificationStatus.SCHEDULED)
             .where(Notification.send_at <= now)
             .where(Notification.attempt_count < Notification.max_attempts)
-            .order_by(Notification.send_at, Notification.id)
+            .order_by(priority_order, Notification.send_at, Notification.id)
             .limit(limit)
             .with_for_update(skip_locked=True)
         )
