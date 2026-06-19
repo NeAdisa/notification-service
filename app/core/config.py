@@ -13,6 +13,7 @@ class Settings(BaseSettings):
         default=DEFAULT_DATABASE_URL,
         alias="DATABASE_URL",
     )
+    redis_url: str = Field(default="redis://localhost:6379/0", alias="REDIS_URL")
     rate_limit_max: int = Field(default=10, alias="RATE_LIMIT_MAX")
     env: str = Field(default="local", alias="ENV")
 

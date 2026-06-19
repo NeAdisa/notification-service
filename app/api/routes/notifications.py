@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db_session
 from app.models.notification import NotificationPriority
+from app.rate_limit.limiter import limit_notifications_by_ip
 from app.repositories.notification import NotificationRepository
 from app.schemas.notification import NotificationCreate, NotificationRead
 from app.services.notification import NotificationService
@@ -27,6 +28,7 @@ def get_notification_service(
 async def create_notification(
     payload: NotificationCreate,
     service: Annotated[NotificationService, Depends(get_notification_service)],
+    _: Annotated[None, Depends(limit_notifications_by_ip)],
 ):
     return await service.create(payload)
 
