@@ -63,9 +63,7 @@ def get_notification_service(
                 }
             },
             "content": {
-                "application/json": {
-                    "example": {"detail": "Rate limit exceeded"}
-                }
+                "application/json": {"example": {"detail": "Rate limit exceeded"}}
             },
         },
     },
@@ -140,9 +138,7 @@ async def list_notifications(
             "model": ErrorResponse,
             "description": "Notification with the given ID does not exist.",
             "content": {
-                "application/json": {
-                    "example": {"detail": "Notification not found"}
-                }
+                "application/json": {"example": {"detail": "Notification not found"}}
             },
         },
         status.HTTP_409_CONFLICT: {
@@ -150,9 +146,7 @@ async def list_notifications(
             "description": "Notification exists but is not scheduled anymore.",
             "content": {
                 "application/json": {
-                    "example": {
-                        "detail": "Only scheduled notifications can be deleted"
-                    }
+                    "example": {"detail": "Only scheduled notifications can be deleted"}
                 }
             },
         },

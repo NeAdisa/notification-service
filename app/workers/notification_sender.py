@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from app.core.config import get_settings
 from app.db.session import AsyncSessionLocal
@@ -27,12 +27,12 @@ async def process_due_notifications() -> None:
     async with AsyncSessionLocal() as session:
         repository = NotificationRepository(session)
         notifications = await repository.get_due_for_sending(
-            now=datetime.now(timezone.utc),
+            now=datetime.now(UTC),
             limit=settings.sender_batch_size,
         )
 
         for notification in notifications:
-            attempted_at = datetime.now(timezone.utc)
+            attempted_at = datetime.now(UTC)
             await repository.mark_processing(
                 notification,
                 attempted_at=attempted_at,
@@ -49,7 +49,7 @@ async def process_due_notifications() -> None:
             else:
                 await repository.mark_sent(
                     notification,
-                    sent_at=datetime.now(timezone.utc),
+                    sent_at=datetime.now(UTC),
                 )
 
 

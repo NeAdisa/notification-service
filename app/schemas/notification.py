@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
@@ -56,10 +56,10 @@ class NotificationCreate(BaseModel):
     @field_validator("send_at")
     @classmethod
     def send_at_must_not_be_in_past(cls, value: datetime) -> datetime:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         comparable_value = value
         if comparable_value.tzinfo is None:
-            comparable_value = comparable_value.replace(tzinfo=timezone.utc)
+            comparable_value = comparable_value.replace(tzinfo=UTC)
         if comparable_value < now:
             raise ValueError("send_at must not be in the past")
         return value
