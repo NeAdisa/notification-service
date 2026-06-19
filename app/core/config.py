@@ -15,6 +15,14 @@ class Settings(BaseSettings):
     )
     redis_url: str = Field(default="redis://localhost:6379/0", alias="REDIS_URL")
     rate_limit_max: int = Field(default=10, alias="RATE_LIMIT_MAX")
+    sender_interval_seconds: int = Field(default=5, alias="SENDER_INTERVAL_SECONDS")
+    sender_batch_size: int = Field(default=10, alias="SENDER_BATCH_SIZE")
+    notification_max_attempts: int = Field(
+        default=3,
+        ge=1,
+        le=10,
+        alias="NOTIFICATION_MAX_ATTEMPTS",
+    )
     env: str = Field(default="local", alias="ENV")
 
     model_config = SettingsConfigDict(

@@ -15,6 +15,7 @@ class NotificationPriority(str, enum.Enum):
 
 class NotificationStatus(str, enum.Enum):
     SCHEDULED = "scheduled"
+    PROCESSING = "processing"
     SENT = "sent"
     FAILED = "failed"
     CANCELLED = "cancelled"
@@ -53,6 +54,27 @@ class Notification(Base):
         server_default=NotificationStatus.SCHEDULED.value,
         index=True,
     )
+    attempt_count: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default="0",
+    )
+    max_attempts: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=3,
+        server_default="3",
+    )
+    last_attempt_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    sent_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+    last_error: Mapped[str | None] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

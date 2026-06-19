@@ -10,6 +10,7 @@ class NotificationCreate(BaseModel):
     message: str = Field(..., min_length=10, max_length=500)
     send_at: datetime
     priority: NotificationPriority
+    max_attempts: int | None = Field(default=None, ge=1, le=10)
 
     @field_validator("send_at")
     @classmethod
@@ -30,6 +31,11 @@ class NotificationRead(BaseModel):
     send_at: datetime
     priority: NotificationPriority
     status: NotificationStatus
+    attempt_count: int
+    max_attempts: int
+    last_attempt_at: datetime | None
+    sent_at: datetime | None
+    last_error: str | None
     created_at: datetime
     updated_at: datetime
 

@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 
+from app.core.config import get_settings
 from app.models.notification import (
     Notification,
     NotificationPriority,
@@ -14,7 +15,11 @@ class NotificationService:
         self.repository = repository
 
     async def create(self, payload: NotificationCreate) -> Notification:
-        return await self.repository.create(payload)
+        settings = get_settings()
+        return await self.repository.create(
+            payload,
+            max_attempts=payload.max_attempts or settings.notification_max_attempts,
+        )
 
     async def list(
         self,

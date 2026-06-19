@@ -1,15 +1,23 @@
+import asyncio
 from collections.abc import AsyncGenerator
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI
 
 from app.api.routes.notifications import router as notifications_router
 from app.rate_limit.redis import redis_client
+from app.workers.notification_sender import run_notification_sender_loop
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncGenerator[None, None]:
-    yield
+    sender_task = asyncio.create_task(run_notification_sender_loop())
+    try:
+        yield
+    finally:
+        sender_task.cancel()
+        with suppress(asyncio.CancelledError):
+            await sender_task
     await redis_client.aclose()
 
 

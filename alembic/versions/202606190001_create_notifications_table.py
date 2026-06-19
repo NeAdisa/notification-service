@@ -32,6 +32,7 @@ def upgrade() -> None:
             "status",
             sa.Enum(
                 "scheduled",
+                "processing",
                 "sent",
                 "failed",
                 "cancelled",
