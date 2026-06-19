@@ -155,8 +155,6 @@ Pydantic-схемы проверяют:
 
 ## Rate Limiter
 
-Rate limiter написан вручную, без slowapi.
-
 Используется Redis:
 
 ```text
